@@ -11,35 +11,27 @@ export default function ChatBox() {
   const keywords = ['health', 'nutrition', 'exercise', 'diet', 'stress', 'fitness', 'wellness','sugar'];
 
   const getAssistantResponse = async () => {
-    // Check if the user input contains relevant keywords
-    const containsKeyword = keywords.some((keyword) => userMessage.toLowerCase().includes(keyword));
-
-    if (!containsKeyword) {
-      setErrorMessage("This assistant focuses on health topics. Please ask health-related questions.");
-      setAssistantResponse(''); // Clear previous responses
+    // const containsKeyword = keywords.some((keyword) => userMessage.toLowerCase().includes(keyword));
+  
+    if (!userMessage.toLowerCase().includes("tell me a story")) {
+      setAssistantResponse("This assistant focuses on storytelling. Please ask for a story!");
       return;
-    } else {
-      setErrorMessage(''); // Clear the error message
-    }
-
+   }
+   
+  
     try {
-      // Prepare the payload
       const payload = {
-        inputs: userMessage,
+        inputs: `Tell a story about ${userMessage}`,
         parameters: {
-          top_p: 0.01,
-          temperature: 0.7,
-          max_new_tokens: 150,
+          top_p: 0.9,  // Allows a wider range of vocabulary for creative storytelling
+          temperature: 1,  // Higher temperature for creative variation
+          max_new_tokens: 200,
           return_text: true,
           return_full_text: true,
-          return_tensors: true,
-          clean_up_tokenization_spaces: true,
-          prefix: "#",
-          handle_long_generation: "hole"
-        }
+          prefix: "Story:", // Helps nudge the model into narrative mode
+       }
       };
-
-      // Fetch from Hugging Face API
+  
       const response = await fetch("https://l7sol6qs4x9pu9j7.us-east-1.aws.endpoints.huggingface.cloud", {
         method: 'POST',
         headers: {
@@ -49,20 +41,24 @@ export default function ChatBox() {
         },
         body: JSON.stringify(payload)
       });
-
+  
       if (!response.ok) {
         throw new Error("Failed to fetch response from API");
       }
-
+  
       const data = await response.json();
       console.log(data);
       const assistantResponse = data[0]?.generated_text || "Sorry, I couldn’t process your request.";
+      
+      // Optional: Implement response filtering here to avoid repetitive responses
+  
       setAssistantResponse(assistantResponse.replace(/\n/g, "<br/>"));
     } catch (error) {
       console.error("Error:", error);
       setAssistantResponse("Sorry, something went wrong.");
     }
   };
+  
 
   const handleSendMessage = () => {
     getAssistantResponse();
@@ -76,7 +72,7 @@ export default function ChatBox() {
         className='border w-[60%] border-gray-300 rounded-md p-2 mb-4 mx-4 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent'
         type="text"
         value={userMessage}
-        onChange={(e) => setUserMessage(e.target.value.toUpperCase())}
+        onChange={(e) => setUserMessage(e.target.value)}
         placeholder="Ask Anything about health..."
       />
       <button onClick={handleSendMessage} className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>Ask Assistant</button>
