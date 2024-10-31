@@ -27,7 +27,6 @@ const Register = () => {
     const token = window.sessionStorage.getItem("Token");
     if (token) {
       router.push("/");
-
     }
   }, [router]);
   const signUp = async (e) => {
@@ -38,12 +37,11 @@ const Register = () => {
         Data.email,
         Data.password
       );
-      await updateProfile(userCredential.user, { displayName: Data.name });
 
       setMessage("Sign up Successfully");
       setColor("green");
       setShowMessage(true);
-      sessionStorage.setItem("Token", result.user.accessToken);
+      sessionStorage.setItem("Token", userCredential.user.accessToken);
       return userCredential.user;
     } catch (error) {
       console.error("Error signing up:", error.message);
