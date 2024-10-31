@@ -29,7 +29,7 @@ const Register = () => {
     if(token){
       router.push("/")
     }
-  },[]);
+  },[router]);
   const signUp = async (e) => {
     e.preventDefault();
     try {

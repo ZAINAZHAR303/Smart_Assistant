@@ -1,107 +1,160 @@
 "use client";
-import { useState } from "react";
-import parse from "html-react-parser";
-import { collection, addDoc } from "firebase/firestore";
-import { database } from "../../../firebaseConfig";
-export default function ChatBox() {
-  const [userMessage, setUserMessage] = useState("");
-  const [assistantResponse, setAssistantResponse] = useState("");
-  const [errorMessage, setErrorMessage] = useState("");
+import React, { useEffect, useState } from "react";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithPopup,
+  GoogleAuthProvider,
+} from "firebase/auth";
 
-  const databaseRef = collection(database, "users");
+import { auth } from "../../../firebaseConfig";
+import UserMessage from "../components/UserMessage";
+import { useRouter } from "next/navigation";
 
-  const addData = () => {
-    addDoc(databaseRef, {
-      message: userMessage,
-      response: assistantResponse,
-    })
-      
-      .catch((error) => {
-        console.log(error.message);
-      });
-  };
+const Register = () => {
+  const [Data, setdata] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const [showMessage, setShowMessage] = useState(false);
+  const [message, setMessage] = useState("");
+  const [color, setColor] = useState("");
+  const router = useRouter();
+  const googleProvider = new GoogleAuthProvider();
 
-  const getAssistantResponse = async () => {
-    if (!userMessage.toLowerCase().includes("tell me a story")) {
-      setAssistantResponse(
-        "This assistant focuses on storytelling. Please ask for a story!"
-      );
-      return;
-    }
-
-    try {
-      const payload = {
-        inputs: `Tell a story about ${userMessage}`,
-        parameters: {
-          top_p: 0.9, // Allows a wider range of vocabulary for creative storytelling
-          temperature: 1, // Higher temperature for creative variation
-          max_new_tokens: 200,
-          return_text: true,
-          return_full_text: true,
-          prefix: "Story:", // Helps nudge the model into narrative mode
-        },
-      };
-
-      const response = await fetch(
-        "https://l7sol6qs4x9pu9j7.us-east-1.aws.endpoints.huggingface.cloud",
-        {
-          method: "POST",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.NEXT_PUBLIC_HUGGINGFACE_API_KEY}`,
-          },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch response from API");
+  useEffect(() => {
+    // Ensure code only runs on client side
+    if (typeof window !== "undefined") {
+      const token = sessionStorage.getItem("Token");
+      if (token) {
+        router.push("/");
       }
+    }
+  }, [router]);
 
-      const data = await response.json();
-      console.log(data);
-      const assistantResponse =
-        data[0]?.generated_text || "Sorry, I couldn’t process your request.";
+  const signUp = async (e) => {
+    e.preventDefault();
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        Data.email,
+        Data.password
+      );
+      await updateProfile(userCredential.user, { displayName: Data.name });
 
-      setAssistantResponse(assistantResponse.replace(/\n/g, "<br/>"));
-    
+      setMessage("Sign up Successfully");
+      setColor("green");
+      setShowMessage(true);
+      sessionStorage.setItem("Token", userCredential.user.accessToken);
+      return userCredential.user;
     } catch (error) {
-      console.error("Error:", error);
-      setErrorMessage(error.message);
-      setAssistantResponse("Sorry, something went wrong.");
+      console.error("Error signing up:", error.message);
+      setMessage(`Error signing up: ${error.message}`);
+      setColor("red");
+      setShowMessage(true);
+      throw error;
     }
   };
 
-  const handleSendMessage = () => {
-    getAssistantResponse();
-    addData();
-    
+  const SignUpWithGoogle = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log("Google Sign-in successful", result.user);
+      setMessage("Sign up Successfully");
+      setColor("green");
+      setShowMessage(true);
+      sessionStorage.setItem("Token", result.user.accessToken);
+    } catch (error) {
+      setMessage(`Error signing up: ${error.message}`);
+      setColor("red");
+      setShowMessage(true);
+    }
   };
+
+  const hideUserMessage = () => {
+    setShowMessage(false);
+  };
+
+  useEffect(() => {
+    if (message === "Sign up Successfully") {
+      router.push("/");
+    }
+  }, [message, router]);
 
   return (
-    <div className="w-[60%] ml-[300px] p-4 border border-gray-300 rounded-md mx-4">
-      <input
-        className="border w-[70%] border-gray-300 rounded-md p-2 mb-4 mx-4 focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent"
-        type="text"
-        value={userMessage}
-        onChange={(e) => setUserMessage(e.target.value)}
-        placeholder="Ask Anything about health..."
-      />
-      <button
-        onClick={handleSendMessage}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Ask Assistant
-      </button>
-      {errorMessage && <div className="text-red-500">{errorMessage}</div>}
-      
-      <div>
-        <strong>Assistant:</strong>
-        <p >
-          {parse(assistantResponse)}
-        </p>
-        
-      </div>
+    <div className="h-screen w-full flex items-center justify-center bg-gray-100">
+      <form
+        className="max-w-sm mx-auto flex flex-col items-center rounded-lg p-4"
+        onSubmit={signUp}>
+        <div className="mb-5">
+          <label
+            htmlFor="email"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            Your email
+          </label>
+          <input
+            type="email"
+            id="email"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="name@gmail.com"
+            value={Data.email}
+            onChange={(e) => setdata({ ...Data, email: e.target.value })}
+            required
+          />
+        </div>
+        <div className="mb-5">
+          <label
+            htmlFor="password"
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            Your password
+          </label>
+          <input
+            type="password"
+            id="password"
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            value={Data.password}
+            onChange={(e) => setdata({ ...Data, password: e.target.value })}
+            required
+          />
+        </div>
+        <div className="flex items-start mb-5">
+          <div className="flex items-center h-5">
+            <input
+              id="remember"
+              type="checkbox"
+              className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
+              required
+            />
+          </div>
+          <label
+            htmlFor="remember"
+            className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+            Remember me
+          </label>
+        </div>
+        <button
+          type="submit"
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+          Submit
+        </button>
+        <button
+          onClick={SignUpWithGoogle}
+          className="bg-red-400 m-4 p-4 rounded-lg text-white">
+          Signup with Google
+        </button>
+      </form>
+
+      {showMessage && (
+        <UserMessage
+          color={color}
+          message={message}
+          duration={4000}
+          hideMessage={hideUserMessage}
+        />
+      )}
     </div>
   );
-}
+};
+
+export default Register;

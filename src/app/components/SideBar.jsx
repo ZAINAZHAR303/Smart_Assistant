@@ -17,7 +17,7 @@ const SideBar = () => {
     
       getData();
     
-  }, []);
+  }, [getData]);
   return (
     <div className="w-[300px] h-[100%] fixed inset-0 top-0 bg-black rounded-tr-3xl flex flex-col items-start text-center  rounded-br-3xl ">
         <h1 className="text-[20px] text-orange-400 mt-4 ml-4 font-bold text-center">NarrativeForge</h1>
