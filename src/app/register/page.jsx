@@ -10,7 +10,7 @@ import {
 
 import { auth } from "../../../firebaseConfig";
 import UserMessage from "../components/UserMessage";
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation";
 const Register = () => {
   const [Data, setdata] = useState({
     name: "",
@@ -23,13 +23,11 @@ const Register = () => {
   const router = useRouter();
   const googleProvider = new GoogleAuthProvider();
 
-
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const token = window.sessionStorage.getItem("Token");
-      if (token) {
-        router.push("/");
-      }
+    const token = window.sessionStorage.getItem("Token");
+    if (token) {
+      router.push("/");
+
     }
   }, [router]);
   const signUp = async (e) => {
@@ -56,20 +54,20 @@ const Register = () => {
     }
   };
 
-  const SignUpWithGoogle = async () =>{
-    try{
+  const SignUpWithGoogle = async () => {
+    try {
       const result = await signInWithPopup(auth, googleProvider);
       console.log("Google Sign-in successful", result.user);
       setMessage("Sign up Successfully");
       setColor("green");
       setShowMessage(true);
       sessionStorage.setItem("Token", result.user.accessToken);
-    }catch(error){
+    } catch (error) {
       setMessage("Error signing up:", error.message);
       setColor("red");
       setShowMessage(true);
     }
-  }
+  };
   const hideUserMessage = () => {
     setShowMessage(false);
   };
@@ -79,10 +77,12 @@ const Register = () => {
       router.push("/");
     }
   }, [message, router]);
-  
+
   return (
     <div className="h-screen w-full flex items-center justify-center bg-gray-100">
-      <form className="max-w-sm mx-auto flex flex-col items-center rounded-lg p-4 " onSubmit={signUp}>
+      <form
+        className="max-w-sm mx-auto flex flex-col items-center rounded-lg p-4 "
+        onSubmit={signUp}>
         <div className="mb-5">
           <label
             for="email"
@@ -135,8 +135,12 @@ const Register = () => {
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
           Submit
         </button>
-         
-        <button onClick={SignUpWithGoogle} className="bg-red-400 m-4 p-4 rounded-lg text-white ">Signup with Google</button>
+
+        <button
+          onClick={SignUpWithGoogle}
+          className="bg-red-400 m-4 p-4 rounded-lg text-white ">
+          Signup with Google
+        </button>
       </form>
 
       {showMessage && (
