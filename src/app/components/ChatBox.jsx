@@ -12,8 +12,8 @@ import UserMessage from "../components/UserMessage";
 import { useRouter } from "next/navigation";
 
 const Register = () => {
-  const [Data, setdata] = useState({
-    name: "",
+  const [Data, setData] = useState({
+    name: "", // Add a name input if you need this field
     email: "",
     password: "",
   });
@@ -57,7 +57,8 @@ const Register = () => {
     }
   };
 
-  const SignUpWithGoogle = async () => {
+  const SignUpWithGoogle = async (e) => {
+    e.preventDefault();
     try {
       const result = await signInWithPopup(auth, googleProvider);
       console.log("Google Sign-in successful", result.user);
@@ -86,11 +87,13 @@ const Register = () => {
     <div className="h-screen w-full flex items-center justify-center bg-gray-100">
       <form
         className="max-w-sm mx-auto flex flex-col items-center rounded-lg p-4"
-        onSubmit={signUp}>
+        onSubmit={signUp}
+      >
         <div className="mb-5">
           <label
             htmlFor="email"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
             Your email
           </label>
           <input
@@ -99,14 +102,15 @@ const Register = () => {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             placeholder="name@gmail.com"
             value={Data.email}
-            onChange={(e) => setdata({ ...Data, email: e.target.value })}
+            onChange={(e) => setData({ ...Data, email: e.target.value })}
             required
           />
         </div>
         <div className="mb-5">
           <label
             htmlFor="password"
-            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+            className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+          >
             Your password
           </label>
           <input
@@ -114,7 +118,7 @@ const Register = () => {
             id="password"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
             value={Data.password}
-            onChange={(e) => setdata({ ...Data, password: e.target.value })}
+            onChange={(e) => setData({ ...Data, password: e.target.value })}
             required
           />
         </div>
@@ -124,23 +128,25 @@ const Register = () => {
               id="remember"
               type="checkbox"
               className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-blue-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-blue-600 dark:ring-offset-gray-800 dark:focus:ring-offset-gray-800"
-              required
             />
           </div>
           <label
             htmlFor="remember"
-            className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">
+            className="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+          >
             Remember me
           </label>
         </div>
         <button
           type="submit"
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        >
           Submit
         </button>
         <button
           onClick={SignUpWithGoogle}
-          className="bg-red-400 m-4 p-4 rounded-lg text-white">
+          className="bg-red-400 m-4 p-4 rounded-lg text-white"
+        >
           Signup with Google
         </button>
       </form>
