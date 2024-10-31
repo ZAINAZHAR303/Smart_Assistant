@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+
 import ChatBox from "./components/ChatBox";
 
 import Login from "./components/Login";
