@@ -15,10 +15,11 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
+if (typeof window !== "undefined") {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const analytics = getAnalytics(app); // Optional, only if you need analytics
 const database = getFirestore(app);
-
+}
 // Export the Firebase services
 export { app, auth, database };
