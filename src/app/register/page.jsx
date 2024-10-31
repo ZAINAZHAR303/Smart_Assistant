@@ -25,11 +25,13 @@ const Register = () => {
 
 
   useEffect(() => {
-    let token = sessionStorage.getItem("Token")
-    if(token){
-      router.push("/")
+    if (typeof window !== "undefined") {
+      const token = window.sessionStorage.getItem("Token");
+      if (token) {
+        router.push("/");
+      }
     }
-  },[router]);
+  }, [router]);
   const signUp = async (e) => {
     e.preventDefault();
     try {
