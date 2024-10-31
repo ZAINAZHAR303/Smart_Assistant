@@ -1,8 +1,9 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getAuth } from "firebase/auth"
+import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+
 const firebaseConfig = {
   apiKey: "AIzaSyBz8FgH144TpbK7poHCrPXi2tu7ih2waNA",
   authDomain: "next-firebase-a7fc9.firebaseapp.com",
@@ -10,11 +11,20 @@ const firebaseConfig = {
   storageBucket: "next-firebase-a7fc9.firebasestorage.app",
   messagingSenderId: "1069589640207",
   appId: "1:1069589640207:web:f7d1e70cb33a79d3c61f7a",
-  measurementId: "G-XZW9TKLJ4L"
+  measurementId: "G-XZW9TKLJ4L",
 };
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-const analytics = getAnalytics(app);
-export const database= getFirestore(app);
+let app;
+let auth;
+let database;
+
+if (typeof window !== "undefined") {
+  app = initializeApp(firebaseConfig);
+  auth = getAuth(app);
+  const analytics = getAnalytics(app); // Optional, only if you need analytics
+  database = getFirestore(app);
+}
+
+// Export the Firebase services
+export { app, auth, database };

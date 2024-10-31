@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useEffect } from 'react';
 
 const UserMessage = ({ color, message, duration = 1000,hideMessage }) => {
