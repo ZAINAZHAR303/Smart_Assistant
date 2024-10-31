@@ -1,9 +1,31 @@
 "use client";
-
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../../firebaseConfig";
 import Link from "next/link";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const Login = ({ close }) => {
+  const [data,setData] = useState({
+    email: "",
+    password: "",
+  })
+
+  const signIn = async (e) => {
+    e.preventDefault();
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      alert("Sign in Successfully", userCredential.user);
+      close();
+      return userCredential.user;
+    } catch (error) {
+      alert("Error signing in:", error.message);
+      throw error;
+    }
+  };
   const modelRef = useRef();
 
   const closeModel = (e) => {
@@ -18,7 +40,7 @@ const Login = ({ close }) => {
       ref={modelRef}
       onClick={closeModel}>
       
-        <form class="max-w-sm mx-auto w-[50%] bg-white p-6 rounded-xl shadow-lg    ">
+        <form onSubmit={signIn} class="max-w-sm mx-auto w-[50%] bg-white p-6 rounded-xl shadow-lg    ">
           <div class="mb-5 ">
             <label
               for="email"
@@ -30,6 +52,9 @@ const Login = ({ close }) => {
               id="email"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="name@gmail.com"
+              value={data.email}
+              onChange={e => setData({...data,email:e.target.value})}
+
               required
             />
           </div>
@@ -43,6 +68,8 @@ const Login = ({ close }) => {
               type="password"
               id="password"
               class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              value={data.password}
+              onChange={e => setData({...data,password:e.target.value})}
               required
             />
           </div>
@@ -64,6 +91,7 @@ const Login = ({ close }) => {
             </label>
           </div>
           <button
+            
             type="submit"
             class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
             sign in

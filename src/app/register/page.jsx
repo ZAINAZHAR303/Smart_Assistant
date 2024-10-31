@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import {
   createUserWithEmailAndPassword,
   updateProfile,
-  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
 } from "firebase/auth";
 
@@ -20,6 +21,15 @@ const Register = () => {
   const [message, setMessage] = useState("");
   const [color, setColor] = useState("");
   const router = useRouter();
+  const googleProvider = new GoogleAuthProvider();
+
+
+  useEffect(() => {
+    let token = sessionStorage.getItem("Token")
+    if(token){
+      router.push("/")
+    }
+  },[]);
   const signUp = async (e) => {
     e.preventDefault();
     try {
@@ -33,7 +43,7 @@ const Register = () => {
       setMessage("Sign up Successfully");
       setColor("green");
       setShowMessage(true);
-
+      sessionStorage.setItem("Token", result.user.accessToken);
       return userCredential.user;
     } catch (error) {
       console.error("Error signing up:", error.message);
@@ -43,6 +53,21 @@ const Register = () => {
       throw error;
     }
   };
+
+  const SignUpWithGoogle = async () =>{
+    try{
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log("Google Sign-in successful", result.user);
+      setMessage("Sign up Successfully");
+      setColor("green");
+      setShowMessage(true);
+      sessionStorage.setItem("Token", result.user.accessToken);
+    }catch(error){
+      setMessage("Error signing up:", error.message);
+      setColor("red");
+      setShowMessage(true);
+    }
+  }
   const hideUserMessage = () => {
     setShowMessage(false);
   };
@@ -52,24 +77,10 @@ const Register = () => {
       router.push("/");
     }
   }, [message, router]);
-  const signIn = async (e) => {
-    e.preventDefault();
-    try {
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        Data.email,
-        Data.password
-      );
-      alert("Sign in Successfully", userCredential.user);
-      return userCredential.user;
-    } catch (error) {
-      alert("Error signing in:", error.message);
-      throw error;
-    }
-  };
+  
   return (
-    <div className="h-screen w-full flex items-center justify-center bg-slate-300">
-      <form className="max-w-sm mx-auto" onSubmit={signUp}>
+    <div className="h-screen w-full flex items-center justify-center bg-gray-100">
+      <form className="max-w-sm mx-auto flex flex-col items-center rounded-lg p-4 " onSubmit={signUp}>
         <div className="mb-5">
           <label
             for="email"
@@ -80,7 +91,7 @@ const Register = () => {
             type="email"
             id="email"
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-            placeholder="name@flowbite.com"
+            placeholder="name@gmail.com"
             value={Data.email}
             onChange={(e) => setdata({ ...Data, email: e.target.value })}
             required
@@ -122,13 +133,15 @@ const Register = () => {
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
           Submit
         </button>
+         
+        <button onClick={SignUpWithGoogle} className="bg-red-400 m-4 p-4 rounded-lg text-white ">Signup with Google</button>
       </form>
 
       {showMessage && (
         <UserMessage
           color={color}
           message={message}
-          duration={2000}
+          duration={4000}
           hideMessage={hideUserMessage}
         />
       )}
