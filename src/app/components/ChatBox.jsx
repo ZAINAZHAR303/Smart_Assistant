@@ -10,10 +10,10 @@ export default function ChatBox() {
 
   const databaseRef = collection(database, "users");
 
-  const addData = () => {
+  const addData = (response) => {
     addDoc(databaseRef, {
       message: userMessage,
-      response: assistantResponse,
+      response: response,
     })
       
       .catch((error) => {
@@ -65,7 +65,7 @@ export default function ChatBox() {
         data[0]?.generated_text || "Sorry, I couldn’t process your request.";
 
       setAssistantResponse(assistantResponse.replace(/\n/g, "<br/>"));
-    
+      return assistantResponse;
     } catch (error) {
       console.error("Error:", error);
       setErrorMessage(error.message);
@@ -73,10 +73,12 @@ export default function ChatBox() {
     }
   };
 
-  const handleSendMessage = () => {
-    getAssistantResponse();
-    addData();
-    
+  const handleSendMessage = async () => {
+    const res = await getAssistantResponse();
+    console.log("result",res);
+    if (res) {
+      addData(res);
+    }
   };
 
   return (

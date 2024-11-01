@@ -11,7 +11,9 @@ import {
 import { auth } from "../../../firebaseConfig";
 import UserMessage from "../components/UserMessage";
 import { useRouter } from "next/navigation";
+import Login from "../components/Login";
 const Register = () => {
+  const [login, setLogin] = useState(false);
   const [Data, setdata] = useState({
     name: "",
     email: "",
@@ -133,7 +135,15 @@ const Register = () => {
           className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
           Submit
         </button>
+        <div className="flex items-center">
+          <p>if you already register please </p>
 
+          <a
+            className="text-blue-500 underline cursor-pointer ml-4"
+            onClick={() => (login === true ? setLogin(false) : setLogin(true))}>
+            Login
+          </a>
+        </div>
         <button
           onClick={SignUpWithGoogle}
           className="bg-red-400 m-4 p-4 rounded-lg text-white ">
@@ -149,6 +159,7 @@ const Register = () => {
           hideMessage={hideUserMessage}
         />
       )}
+      {login && <Login close={() => setLogin(false)} />}
     </div>
   );
 };

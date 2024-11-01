@@ -2,9 +2,13 @@
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../firebaseConfig";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation"
 
 const Login = ({ close }) => {
+const router = useRouter();
+
+
   const [data,setData] = useState({
     email: "",
     password: "",
@@ -19,7 +23,9 @@ const Login = ({ close }) => {
         data.password
       );
       alert("Sign in Successfully", userCredential.user);
+      sessionStorage.setItem("Token", userCredential.user.accessToken);
       close();
+      router.push("/");
       return userCredential.user;
     } catch (error) {
       alert("Error signing in:", error.message);
