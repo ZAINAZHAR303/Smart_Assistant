@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { collection, onSnapshot, doc, deleteDoc } from "firebase/firestore";
+import { collection, onSnapshot, doc, deleteDoc,query,where } from "firebase/firestore";
 import { database } from "../../../firebaseConfig";
 import { Delete } from "@mui/icons-material";
 const SideBar = () => {
